@@ -52,7 +52,9 @@ export default function Home() {
 
   return (
     <div style={styles.container}>
-
+      <h1 style={{ color: "red" }}>
+        TEST BUILD 123 🔥
+      </h1>
       {/* ➕ Форма добавления */}
       <AddProduct onAdd={fetchProducts}
         editingProduct={editingProduct} 
