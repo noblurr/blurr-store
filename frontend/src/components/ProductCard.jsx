@@ -3,6 +3,9 @@ import { api } from "../api/client";
 
 export default function ProductCard({ product, onDelete, onEdit }) {
   const navigate = useNavigate();
+  const tg = window.Telegram?.WebApp;
+  const user = tg?.initDataUnsafe?.user;
+  const ADMIN_ID = 7646038777;
 
   return (
     <div style={styles.card} onClick={() => navigate(`/product/${product.id}`)}>
@@ -22,7 +25,9 @@ export default function ProductCard({ product, onDelete, onEdit }) {
     e.stopPropagation();
 
     try {
-      const res = await api.post(`/products/buy/${product.id}`);
+      const res = await api.post(`/products/buy/${product.id}`, {
+      userId: user?.id,
+      });
 
       if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.openInvoice(res.data.link);
@@ -37,24 +42,29 @@ export default function ProductCard({ product, onDelete, onEdit }) {
 >
   Купить ⭐
 </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit(product);
-          }}
-          style={styles.editBtn}
-        >
-          Редактировать
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation(); // ❗ ВАЖНО
-            onDelete(product.id);
-          }}
-          style={styles.deleteBtn}
-        >
-          Удалить
-        </button>
+        {user?.id === ADMIN_ID && (
+  <>
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onEdit(product);
+      }}
+      style={styles.editBtn}
+    >
+      Редактировать
+    </button>
+
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onDelete(product.id);
+      }}
+      style={styles.deleteBtn}
+    >
+      Удалить
+    </button>
+  </>
+)}
       </div>
     </div>
   );

@@ -3,6 +3,8 @@ import cors from "cors";
 import productsRoutes from "./routes/products.js";
 const PORT = process.env.PORT || 3000;
 import axios from "axios";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 const app = express();
 
@@ -48,14 +50,24 @@ app.post("/webhook", async (req, res) => {
   }
 
   // ✅ успешная оплата
-  if (body.message?.successful_payment) {
-    console.log("Оплата прошла успешно! ✅");
+if (body.message?.successful_payment) {
+  console.log("Оплата прошла успешно! ✅");
 
-    const payload = body.message.successful_payment.invoice_payload;
-    console.log("Payload:", payload);
+  const payload = body.message.successful_payment.invoice_payload;
 
-    // потом добавим запись в базу
-  }
+  // пример: "product_2_7646038777"
+  const [_, productId, userId] = payload.split("_");
+
+  await prisma.order.create({
+    data: {
+      productId: Number(productId),
+      userId,
+      status: "paid",
+    },
+  });
+
+  console.log("Заказ создан ✅");
+}
 
   res.sendStatus(200);
 });
