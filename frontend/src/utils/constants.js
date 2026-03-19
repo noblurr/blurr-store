@@ -1,0 +1,1 @@
+export const ADMIN_ID = 7646038777; // 👈 твой telegram id
