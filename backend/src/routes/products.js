@@ -103,7 +103,7 @@ router.post("/buy/:id", async (req, res) => {
         prices: [
           {
             label: product.title,
-            amount: product.price * 100, // важно
+            amount: product.price, // важно
           },
         ],
       }),
