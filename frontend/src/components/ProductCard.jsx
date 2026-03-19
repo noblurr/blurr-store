@@ -4,9 +4,12 @@ import { api } from "../api/client";
 export default function ProductCard({ product, onDelete, onEdit }) {
   const navigate = useNavigate();
   const tg = window.Telegram?.WebApp;
-  const user = tg?.initDataUnsafe?.user;
-  const ADMIN_ID = 7646038777;
 
+let userId = 7646038777; // fallback (админ)
+
+if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+  userId = tg.initDataUnsafe.user.id;
+}
   return (
     <div style={styles.card} onClick={() => navigate(`/product/${product.id}`)}>
       
@@ -20,14 +23,18 @@ export default function ProductCard({ product, onDelete, onEdit }) {
         <h3 style={styles.title}>{product.title}</h3>
 
         <span style={styles.price}>{product.price} ⭐</span>
-        <button
+<button
   onClick={async (e) => {
     e.stopPropagation();
 
+    console.log("CLICK BUY"); // 🔥 проверка
+
     try {
       const res = await api.post(`/products/buy/${product.id}`, {
-      userId: user?.id,
+        userId: userId,
       });
+
+      console.log("INVOICE:", res.data);
 
       if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.openInvoice(res.data.link);
@@ -35,14 +42,14 @@ export default function ProductCard({ product, onDelete, onEdit }) {
         window.open(res.data.link, "_blank");
       }
     } catch (err) {
-      console.error(err);
+      console.error("BUY ERROR:", err);
       alert("Ошибка при оплате");
     }
   }}
 >
   Купить ⭐
 </button>
-        {user?.id === ADMIN_ID && (
+{userId === 7646038777 && (
   <>
     <button
       onClick={(e) => {
